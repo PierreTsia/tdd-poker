@@ -23,8 +23,8 @@
       <div class="inline-block mr-2 mt-2" v-for="[color, label, handler] in ctas" :key="color">
         <button
           type="button"
-          :class="`bg-${color}-500 hover:bg-${color}-600 hover:shadow-lg`"
           class="focus:outline-none text-white text-sm py-2.5 px-5 rounded-md flex items-center"
+          :class="`bg-${color}-500 hover:bg-${color}-600 hover:shadow-lg`"
           @click="handler"
         >
           {{ label }}
