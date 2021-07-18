@@ -66,11 +66,11 @@ export default defineComponent({
     const getWinner = () => {
       const msg = compareHands(hands.value, players.value);
       const [winnerName, handDesc] = msg.split('wins. - with');
-      winner.value = winnerName;
-      handDescription.value = handDesc;
+      winner.value = winnerName as string;
+      handDescription.value = handDesc as string;
     };
 
-    const ctas = [
+    const ctas: [string, string, (args: any) => void][] = [
       ['purple', 'Deal cards', dealCards],
       ['green', ' Get winner', getWinner],
     ];
