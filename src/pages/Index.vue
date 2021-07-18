@@ -1,110 +1,86 @@
-<script lang="ts">
-import { useI18n } from 'vue-i18n';
+<template>
+  <div class="container max-w-200 p-2 h-screen mx-auto flex flex-col w-full">
+    <div class="container flex flex-col items-center justify-center">
+      <div class="container flex flex-col items-center justify-center p-2 min-h-24">
+        <SlideLeftTransition>
+          <h1 v-if="winner" class="text-center w-full font-sans text-3xl font-bold leading-tight mb-2">
+            {{ winner }} wins !
+          </h1>
+        </SlideLeftTransition>
+        <FadeTransition>
+          <p v-if="handDescription" class="leading-normal text-sm text-center w-full text-gray-800 dark:text-gray-200">
+            With {{ handDescription }}
+          </p>
+        </FadeTransition>
+      </div>
+      <div class="card-hand" v-for="(player, i) in players" :key="i">
+        <p class="leading-normal mb-2 text-left text-md font-bold w-full text-white">{{ player }}</p>
+        <CardContainer isStacked class="w-full sm:w-2/3 mx-auto" :cards="hands[i]" />
+      </div>
+    </div>
 
-import { defineComponent, ref } from 'vue';
-import { useTheme } from '/@/composables';
+    <div class="flex max-w-2/3 mx-auto items-center justify-item-center my-auto">
+      <div class="inline-block mr-2 mt-2" v-for="[color, label, handler] in ctas" :key="color">
+        <button
+          type="button"
+          :class="`bg-${color}-500 hover:bg-${color}-600 hover:shadow-lg`"
+          class="focus:outline-none text-white text-sm py-2.5 px-5 rounded-md flex items-center"
+          @click="handler"
+        >
+          {{ label }}
+        </button>
+      </div>
+    </div>
+
+    <div class="container h-auto">
+      <Footer />
+    </div>
+  </div>
+</template>
+<script lang="ts">
+import { defineComponent, ref, Ref } from 'vue';
+
+import Footer from '/@/components/Footer.vue';
+import CardContainer from '/@/components/CardsContainer.vue';
+import SlideLeftTransition from '/@/ui/transitions/SlideLeftTransition.vue';
+import FadeTransition from '/@/ui/transitions/FadeTransition.vue';
+import { useHandScore } from '/@/composables/useHandScore';
 
 export default defineComponent({
   name: 'Home',
+  components: { Footer, CardContainer, SlideLeftTransition, FadeTransition },
   setup() {
-    const { t, availableLocales, locale } = useI18n();
+    const { compareHands, distribute } = useHandScore();
+    const hands: Ref<string[]> = ref([]);
+    const players: Ref<string[]> = ref(['Bob', 'Alice']);
+    const winner: Ref<string | null> = ref(null);
+    const handDescription: Ref<string | null> = ref(null);
+    const HAND_CARD_COUNT = 5;
 
-    const toggleLocales = () => {
-      const locales = availableLocales;
-      locale.value =
-        locales[(locales.indexOf(locale.value) + 1) % locales.length];
+    const dealCards = () => {
+      winner.value = null;
+      handDescription.value = null;
+      hands.value = distribute(players.value.length * HAND_CARD_COUNT);
     };
 
-    const { isDark, toggleDark } = useTheme();
+    const getWinner = () => {
+      const msg = compareHands(hands.value, players.value);
+      const [winnerName, handDesc] = msg.split('wins. - with');
+      winner.value = winnerName;
+      handDescription.value = handDesc;
+    };
 
-    const show = ref(false);
+    const ctas = [
+      ['purple', 'Deal cards', dealCards],
+      ['green', ' Get winner', getWinner],
+    ];
 
-    setTimeout(() => {
-      show.value = true;
-    }, 1000);
-
-    return { locale, t, show, toggleLocales, isDark, toggleDark };
+    return { ctas, hands, winner, players, handDescription };
   },
 });
 </script>
-<template>
-  <div class="container max-w-3xl mx-auto mt-60">
-    <div class="h-60 mb-8">
-      <transition
-        enter-active-class="transition ease-out duration-1000 transform"
-        enter-from-class="-translate-x-100 opacity-0"
-        enter-to-class="translate-x-0 opacity-100"
-        leave-active-class="transition ease-in duration-1000 transform"
-        leave-from-class="opacity-100"
-        leave-to-class="opacity-0"
-      >
-        <img
-          v-if="show"
-          alt="Vitesome logo"
-          class="w-52 mx-auto mb-12"
-          :src="'logotype.svg'"
-        />
-      </transition>
-    </div>
-
-    <HelloWorld :msg="t('hello') + ' 👋 !!'" />
-
-    <footer class="text-center">
-      <ul class="flex justify-between w-1/3 mx-auto mb-8">
-        <li class="cursor-pointer text-2xl">
-          <a
-            href="#"
-            @click="toggleLocales"
-            class="footer-link text-cyan-700 hover:text-cyan-500"
-            :title="t('toggle_language')"
-          >
-            <i class="iconify" :data-icon="'ant-design:translation-outlined'" />
-          </a>
-        </li>
-        <li class="cursor-pointer text-2xl">
-          <a
-            href="#"
-            @click="toggleDark"
-            class="text-cyan-700 hover:text-cyan-500"
-            :title="t('toggle_theme')"
-          >
-            <i class="iconify" :data-icon="'mdi:theme-light-dark'" />
-          </a>
-        </li>
-        <li class="cursor-pointer text-2xl">
-          <a
-            href="https://github.com/alvarosaburido"
-            rel="noreferrer"
-            target="_blank"
-            class="footer-link text-cyan-700 hover:text-cyan-500"
-            title="Github repo"
-          >
-            <i class="iconify" :data-icon="'mdi:github'" />
-          </a>
-        </li>
-      </ul>
-
-      <span class="text-xs"
-        >{{ t('made_by') }}
-        <a
-          class="footer-link text-cyan-400 hover:text-cyan-500"
-          href="https://github.com/alvarosaburido"
-          rel="noreferrer"
-          target="_blank"
-          >Alvaro Saburido</a
-        ></span
-      >
-    </footer>
-  </div>
-</template>
-
-<style>
-a,
-.footer-link {
-  @apply transition-all ease-out duration-100;
-}
-
-.footer-link {
-  opacity: 0.8;
+<style scoped>
+.card-hand {
+  @apply my-4 container min-h-60 flex flex-col items-center p-2 sm:p-8 sm:pt-2 bg-green-900 border-2 border-yellow-900 dark:border-indigo-900 rounded-lg;
 }
 </style>

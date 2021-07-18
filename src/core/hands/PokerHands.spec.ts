@@ -153,7 +153,7 @@ describe("Poker Hands Manager", () => {
         "it should return %s when hands are %p",
         (output, hands) => {
           const players = ["Bob", "John"];
-          expect(handsManager.output(players, hands)).toEqual(output);
+          expect(handsManager.outputWinner(players, hands)).toEqual(output);
         }
       );
     });

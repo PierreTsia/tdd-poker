@@ -20,7 +20,7 @@ export class PokerHandService {
     return this.rank.sortHands(handStrings.map((hs) => new Hand(hs)));
   }
 
-  output(players: string[], handStrings: string[]): string {
+  outputWinner(players: string[], handStrings: string[]): string {
     const hands = handStrings.map((hs) => new Hand(hs));
 
     if (this.rank.isATie(hands)) {
@@ -101,7 +101,6 @@ export class HandsRankingManager {
     if (this.isAWinnerCard(highestCard1, highestCard2)) {
       return this.firstCardWins(highestCard1, highestCard2) ? -1 : 1;
     } else {
-      debugger;
       return this.sortByRestCards(h1, h2);
     }
   }

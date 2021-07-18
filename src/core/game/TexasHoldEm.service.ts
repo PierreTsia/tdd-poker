@@ -1,7 +1,7 @@
-import { PokerDeckService } from "../deck/PokerDeck.service";
-import { PokerDealService } from "../deal/PokerDeal.service";
-import { HandState } from "./../types/index.type";
-import { Card } from "./../hands/PokerHands.service";
+import { PokerDeckService } from '../deck/PokerDeck.service';
+import { PokerDealService } from '../deal/PokerDeal.service';
+import { HandState } from './../types/index.type';
+import { Card } from './../hands/PokerHands.service';
 
 const cardsCountMap: Map<HandState, number> = new Map([
   [HandState.PreFlop, 0],
@@ -13,6 +13,9 @@ const cardsCountMap: Map<HandState, number> = new Map([
 interface GameState {
   handState: HandState;
 }
+
+const POCKET_CARDS_COUNT = 2;
+const BURN_CARD_COUNT = 1;
 
 export class TexasHoldEmService {
   players: string[] = [];
@@ -52,24 +55,25 @@ export class TexasHoldEmService {
 
   public dealPlayerCards() {
     if (this.isPlayersCardsDealt) {
-      throw new Error("Player Cards dealt already");
+      throw new Error('Player Cards dealt already');
     }
-    const cardsCount = 2;
+
     const offset =
       this.players.indexOf(this.dealService.getStatus().dealer) + 1;
+
     this.playerCards = this.getDistributedCards(
-      cardsCount,
+      POCKET_CARDS_COUNT,
       this.players.length,
-      offset
+      offset,
     );
   }
 
   private getDistributedCards(
     cardsCount: number,
     playersCount: number,
-    offset: number
+    offset: number,
   ) {
-    return [...Array(cardsCount)].reduce((acc) => {
+    return [...Array(cardsCount)].reduce(acc => {
       [...Array(playersCount)].forEach((_: any, plyIndex: number) => {
         const card = this.deckService.deal(1)[0];
         const index =
@@ -91,14 +95,15 @@ export class TexasHoldEmService {
       throw new Error(`Can't deal common cards before ${HandState.PreFlop}`);
     } else if (this.isDealingOver) {
       throw new Error(
-        `Common Cards dealt already for ${this.currentHandState}`
+        `Common Cards dealt already for ${this.currentHandState}`,
       );
     }
     const cardsCount = cardsCountMap.get(this.currentHandState)!;
-    this.commonCards = [
-      ...this.commonCards,
-      ...this.deckService.deal(cardsCount),
-    ];
+    [...Array(cardsCount)].forEach(() => {
+      this.deckService.deal(BURN_CARD_COUNT);
+      const card: Card = this.deckService.deal(1)[0];
+      this.commonCards.push(card);
+    });
   }
 
   private get stateIndex(): number {
@@ -141,7 +146,7 @@ export class TexasHoldEmService {
     return !!(
       this.currentHandState === HandState.PreFlop &&
       this.playerCards.length &&
-      this.playerCards.every((cards) => cards.length === 2)
+      this.playerCards.every(cards => cards.length === 2)
     );
   }
 }
