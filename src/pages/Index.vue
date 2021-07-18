@@ -20,15 +20,11 @@
     </div>
 
     <div class="flex max-w-2/3 mx-auto items-center justify-item-center my-auto">
-      <div class="inline-block mr-2 mt-2" v-for="[color, label, handler] in ctas" :key="color">
-        <button
-          type="button"
-          class="focus:outline-none text-white text-sm py-2.5 px-5 rounded-md flex items-center"
-          :class="`bg-${color}-500 hover:bg-${color}-600 hover:shadow-lg`"
-          @click="handler"
-        >
-          {{ label }}
-        </button>
+      <div class="inline-block mr-2 mt-2">
+        <button type="button" class="btn bg-purple-500 hover:bg-purple-600" @click="dealCards">Deal cards</button>
+      </div>
+      <div class="inline-block mr-2 mt-2">
+        <button type="button" class="btn bg-green-500 hover:bg-green-600" @click="getWinner">Get winner</button>
       </div>
     </div>
 
@@ -70,17 +66,15 @@ export default defineComponent({
       handDescription.value = handDesc as string;
     };
 
-    const ctas: [string, string, (args: any) => void][] = [
-      ['purple', 'Deal cards', dealCards],
-      ['green', ' Get winner', getWinner],
-    ];
-
-    return { ctas, hands, winner, players, handDescription };
+    return { dealCards, getWinner, hands, winner, players, handDescription };
   },
 });
 </script>
 <style scoped>
 .card-hand {
   @apply my-4 container min-h-60 flex flex-col items-center p-2 sm:p-8 sm:pt-2 bg-green-900 border-2 border-yellow-900 dark:border-indigo-900 rounded-lg;
+}
+.btn {
+  @apply focus:outline-none text-white text-sm py-2.5 px-5 rounded-md flex items-center hover:shadow-lg;
 }
 </style>
