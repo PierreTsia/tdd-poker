@@ -4,7 +4,7 @@
       <div class="container flex flex-col items-center justify-center p-2 min-h-24">
         <SlideLeftTransition>
           <h1 v-if="winner" class="text-center w-full font-sans text-3xl font-bold leading-tight mb-2">
-            {{ winner }} wins !
+            {{ result }}
           </h1>
         </SlideLeftTransition>
         <FadeTransition>
@@ -34,7 +34,7 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, Ref } from 'vue';
+import { defineComponent, ref, Ref, computed } from 'vue';
 
 import Footer from '/@/components/Footer.vue';
 import CardContainer from '/@/components/CardsContainer.vue';
@@ -53,6 +53,8 @@ export default defineComponent({
     const handDescription: Ref<string | null> = ref(null);
     const HAND_CARD_COUNT = 5;
 
+    const result = computed(() => (winner.value && winner.value === 'Tie' ? "It's a Tie !" : `${winner.value} wins!`));
+
     const dealCards = () => {
       winner.value = null;
       handDescription.value = null;
@@ -66,7 +68,7 @@ export default defineComponent({
       handDescription.value = handDesc as string;
     };
 
-    return { dealCards, getWinner, hands, winner, players, handDescription };
+    return { dealCards, getWinner, hands, winner, players, handDescription, result };
   },
 });
 </script>
