@@ -1,5 +1,5 @@
 <template>
-  <div class="rounded overflow-hidden shadow-lg w-30 card">
+  <div class="rounded overflow-hidden shadow-lg w-20 sm:w-30 card">
     <svg v-if="!isHidden" xmlns="http://www.w3.org/2000/svg" viewBox="-120 -168 240 336" preserveAspectRatio="none">
       <slot />
     </svg>

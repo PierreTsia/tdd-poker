@@ -1,7 +1,7 @@
 <template>
-  <div class="container flex flex-wrap justify-items-center items-center S-100">
+  <div class="container flex flex-wrap justify-items-center items-center">
     <div v-for="(cardSlug, i) in cardSlugs" :key="i">
-      <component :is="`Card${cardSlug}`" :class="{ '-mr-16': isStacked }" />
+      <component :is="`Card${cardSlug}`" :class="{ '-mr-10 sm:-mr-16': isStacked }" />
     </div>
   </div>
 </template>
