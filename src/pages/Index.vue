@@ -1,5 +1,5 @@
 <template>
-  <div class="container max-w-200 p-2 h-screen mx-auto flex flex-col w-full">
+  <div class="container max-w-200 p-2 h-auto sm:h-screen mx-auto flex flex-col w-full">
     <div class="container flex flex-col items-center justify-center">
       <div class="container flex flex-col items-center justify-center p-2 min-h-24">
         <SlideLeftTransition>
@@ -28,7 +28,7 @@
       </div>
     </div>
 
-    <div class="container h-auto">
+    <div class="container h-auto mt-auto">
       <Footer />
     </div>
   </div>
@@ -74,7 +74,7 @@ export default defineComponent({
 </script>
 <style scoped>
 .card-hand {
-  @apply my-4 container min-h-60 flex flex-col items-center p-2 sm:p-8 sm:pt-2 bg-green-900 border-2 border-yellow-900 dark:border-indigo-900 rounded-lg;
+  @apply my-4 container min-h-30 sm:min-h-60 flex flex-col items-center p-2 sm:p-8 sm:pt-2 bg-green-900 border-2 border-yellow-900 dark:border-indigo-900 rounded-lg;
 }
 .btn {
   @apply focus:outline-none text-white text-sm py-2.5 px-5 rounded-md flex items-center hover:shadow-lg;
