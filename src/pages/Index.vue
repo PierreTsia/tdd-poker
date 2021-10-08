@@ -46,7 +46,7 @@ export default defineComponent({
   name: 'Home',
   components: { Footer, CardContainer, SlideLeftTransition, FadeTransition },
   setup() {
-    const { compareHands, distribute } = useHandScore();
+    const { compareHands, distribute, start } = useHandScore();
     const hands: Ref<string[]> = ref([]);
     const players: Ref<string[]> = ref(['Bob', 'Alice']);
     const winner: Ref<string | null> = ref(null);
@@ -58,7 +58,8 @@ export default defineComponent({
     const dealCards = () => {
       winner.value = null;
       handDescription.value = null;
-      hands.value = distribute(players.value.length * HAND_CARD_COUNT);
+      start(players.value)
+      hands.value = distribute(HAND_CARD_COUNT, 2);
     };
 
     const getWinner = () => {
