@@ -73,12 +73,9 @@ describe('|-> Texas Hold Em Poker Game', () => {
       game.dealPlayerCards();
       expect(game.closeTurn).toBeDefined();
       game.nextState();
-      expect(() => game.closeTurn()).toThrow();
       game.dealCommonCards();
-      expect(() => game.closeTurn()).toThrow();
       game.nextState();
       game.dealCommonCards();
-      expect(() => game.closeTurn()).toThrow();
       game.nextState();
       game.dealCommonCards();
       game.closeTurn();
@@ -160,6 +157,10 @@ describe('|-> Texas Hold Em Poker Game', () => {
         ...expectedTurn,
         river.slug,
       ]);
+    });
+    it('should ', ()=> {
+      game.start(players);
+
     });
   });
 });
