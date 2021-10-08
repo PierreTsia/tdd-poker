@@ -46,10 +46,29 @@ describe('|-> Poker Bet Service', () => {
   });
 
   it('should have a pot that is initially worth zero', () => {
-    expect(betService.pot).toEqual(0)
-  })
+    expect(betService.pot).toEqual(0);
+  });
 
   it('should have a closeBets() fn that empties the currentBets and add its amount to pot ', () => {
+    expect(betService.closeBets).toBeDefined();
+    betService.bet('Bob', 10);
+    betService.bet('Alice', 10);
+    betService.bet('John', 10);
+    expect(betService.currentBets).toEqual([10, 10, 10]);
+    expect(betService.pot).toEqual(0);
 
+    betService.closeBets();
+    expect(betService.currentBets).toEqual([0, 0, 0]);
+    expect(betService.pot).toEqual(30);
   });
+
+  it('should have an applyBlinds() method', () => {
+    //expect(betService.applyBlinds).toBeDefined();
+  });
+
+  it('should expose an awaitedPlayer() getter', () => {
+    // order according to blinds + call if bet under maximum current
+  });
+  it('should expose an maxCurrentBet() getter', () => {});
+  it('should not allow bets under max current bet', () => {});
 });
