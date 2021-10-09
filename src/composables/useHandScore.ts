@@ -13,10 +13,14 @@ export const useHandScore = () => {
     gameService.start(players);
   };
 
-  const distribute = (cardToDistribute: number, playersCount = 2): string[] => {
-    const hands = gameService.distributeCard(cardToDistribute, playersCount, 0);
-    return hands.map((hand: Card[]) => hand.map(c => c.slug).join(' '));
+  const reset = () => {
+    gameService.deckService.shuffle();
   };
 
-  return { compareHands, distribute, start };
+  const distribute = (cardToDistribute: number, playersCount = 2): string[] => {
+    const hands = gameService.distributeCard(cardToDistribute, playersCount, 0);
+    return hands.map((hand: Card[]) => hand.map(c => c?.slug).join(' '));
+  };
+
+  return { compareHands, distribute, start, reset };
 };

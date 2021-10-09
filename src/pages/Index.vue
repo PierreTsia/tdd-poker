@@ -9,7 +9,7 @@
         </SlideLeftTransition>
         <FadeTransition>
           <p v-if="handDescription" class="leading-normal text-sm text-center w-full text-gray-800 dark:text-gray-200">
-            With {{ handDescription }}
+            {{ t('with') }} {{ handDescription }}
           </p>
         </FadeTransition>
       </div>
@@ -21,10 +21,12 @@
 
     <div class="flex max-w-2/3 mx-auto items-center justify-item-center my-auto">
       <div class="inline-block mr-2 mt-2">
-        <button type="button" class="btn bg-purple-500 hover:bg-purple-600" @click="dealCards">Deal cards</button>
+        <button type="button" class="btn bg-purple-500 hover:bg-purple-600" @click="dealCards">{{ t('deal') }}</button>
       </div>
       <div class="inline-block mr-2 mt-2">
-        <button type="button" class="btn bg-green-500 hover:bg-green-600" @click="getWinner">Get winner</button>
+        <button type="button" class="btn bg-green-500 hover:bg-green-600" @click="getWinner">
+          {{ t('compare_hands') }}
+        </button>
       </div>
     </div>
 
@@ -41,35 +43,46 @@ import CardContainer from '/@/components/CardsContainer.vue';
 import SlideLeftTransition from '/@/ui/transitions/SlideLeftTransition.vue';
 import FadeTransition from '/@/ui/transitions/FadeTransition.vue';
 import { useHandScore } from '/@/composables/useHandScore';
+import { useI18n } from 'vue-i18n';
+import { cardUnicode } from '/@/core/types/index.type';
 
 export default defineComponent({
   name: 'Home',
   components: { Footer, CardContainer, SlideLeftTransition, FadeTransition },
   setup() {
-    const { compareHands, distribute, start } = useHandScore();
+    const { compareHands, distribute, start, reset } = useHandScore();
+    const { t } = useI18n();
     const hands: Ref<string[]> = ref([]);
     const players: Ref<string[]> = ref(['Bob', 'Alice']);
     const winner: Ref<string | null> = ref(null);
     const handDescription: Ref<string | null> = ref(null);
     const HAND_CARD_COUNT = 5;
 
-    const result = computed(() => (winner.value && winner.value === 'Tie' ? "It's a Tie !" : `${winner.value} wins!`));
+    const result = computed(() =>
+      winner.value && winner.value === 'Tie' ? t('tie') : t('output_winner', { name: winner.value }),
+    );
 
     const dealCards = () => {
+      reset();
       winner.value = null;
       handDescription.value = null;
-      start(players.value)
+      start(players.value);
       hands.value = distribute(HAND_CARD_COUNT, 2);
     };
 
     const getWinner = () => {
-      const msg = compareHands(hands.value, players.value);
-      const [winnerName, handDesc] = msg.split('wins. - with');
-      winner.value = winnerName as string;
-      handDescription.value = handDesc as string;
+      const { player, result, cards } = compareHands(hands.value, players.value);
+      if (result === 'Tie') {
+        winner.value = 'Tie';
+      } else {
+        winner.value = player!;
+        handDescription.value = cards
+          .map((c: string) => String.fromCodePoint(parseInt(cardUnicode.get(c) as string, 16)))
+          .join(' ');
+      }
     };
 
-    return { dealCards, getWinner, hands, winner, players, handDescription, result };
+    return { dealCards, getWinner, hands, winner, players, handDescription, result, t, cardUnicode };
   },
 });
 </script>

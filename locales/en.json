@@ -1,5 +1,10 @@
 {
   "hello": "Hello",
   "made_by": "Made by",
-  "toggle_language": "Toggle Language"
+  "toggle_language": "Toggle Language",
+  "deal": "Deal cards",
+  "compare_hands": "Compare hands",
+  "output_winner": "Winner is {name}",
+  "tie": "It's a Tie !",
+  "with": "with"
 }

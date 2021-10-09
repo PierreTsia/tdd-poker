@@ -1,5 +1,5 @@
-import { Card } from "./../hands/PokerHands.service";
-import { CardValue, Color } from "./../types/index.type";
+import { Card } from './../hands/PokerHands.service';
+import { CardValue, Color } from './../types/index.type';
 
 export class PokerDeckService {
   public cards: Card[] = [];
@@ -14,6 +14,7 @@ export class PokerDeckService {
   }
 
   public shuffle(): void {
+    this.cards = this.generateCards();
     let cur = this.cards.length;
     let rand;
     while (cur !== 0) {
@@ -24,13 +25,10 @@ export class PokerDeckService {
   }
 
   private getColorCards(color: Color): Card[] {
-    return Object.values(CardValue).map((val) => new Card(`${val}${color}`));
+    return Object.values(CardValue).map(val => new Card(`${val}${color}`));
   }
 
   private generateCards() {
-    return Object.values(Color).reduce(
-      (acc, color) => [...acc, ...this.getColorCards(color)],
-      [] as Card[]
-    );
+    return Object.values(Color).reduce((acc, color) => [...acc, ...this.getColorCards(color)], [] as Card[]);
   }
 }

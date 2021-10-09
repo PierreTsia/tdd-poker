@@ -158,9 +158,5 @@ describe('|-> Texas Hold Em Poker Game', () => {
         river.slug,
       ]);
     });
-    it('should ', ()=> {
-      game.start(players);
-
-    });
   });
 });

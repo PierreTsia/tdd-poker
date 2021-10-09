@@ -1,0 +1,10 @@
+{
+  "hello": "Bonjour",
+  "made_by": "Fait par",
+  "toggle_language": "Changer la langue",
+  "deal": "Distribuer",
+  "compare_hands": "Comparer les mains",
+  "output_winner": "{name} remporte la main",
+  "tie": "It's a Tie !",
+  "with": "avec"
+}

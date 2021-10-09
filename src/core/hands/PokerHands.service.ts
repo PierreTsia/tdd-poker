@@ -1,10 +1,4 @@
-import {
-  CardValue,
-  Color,
-  HandScoreResult,
-  HandValue,
-  TestHandFn,
-} from "../types/index.type";
+import { CardValue, Color, HandScoreResult, HandValue, TestHandFn } from '../types/index.type';
 
 export class PokerHandService {
   private rank = new HandsRankingManager();
@@ -13,26 +7,21 @@ export class PokerHandService {
   }
 
   getRankedHandsScores(...handStrings: string[]): HandScore[] {
-    return this.getRankedHands(handStrings).map((h) => h.score);
+    return this.getRankedHands(handStrings).map(h => h.score);
   }
 
   private getRankedHands(handStrings: string[]) {
-    return this.rank.sortHands(handStrings.map((hs) => new Hand(hs)));
+    return this.rank.sortHands(handStrings.map(hs => new Hand(hs)));
   }
 
-  outputWinner(players: string[], handStrings: string[]): string {
-    const hands = handStrings.map((hs) => new Hand(hs));
-
+  outputWinner(players: string[], handStrings: string[]): { player?: string; result: string; cards: string[] } {
+    const hands = handStrings.map(hs => new Hand(hs));
     if (this.rank.isATie(hands)) {
-      return "Tie";
+      return { result: 'Tie', cards: [] };
     }
-
     const winningHand = this.getRankedHands(handStrings)[0];
     const index = handStrings.indexOf(winningHand.handString);
-
-    return `${players[index]} wins. - with ${
-      winningHand.score.value
-    }: ${winningHand.score.cards.join(", ")}`;
+    return { player: players[index], result: winningHand.score.value, cards: winningHand.score.cards };
   }
 }
 
@@ -48,11 +37,9 @@ export class HandsRankingManager {
   }
 
   isATie(hands: Hand[]): boolean {
-    const handsValues = hands.map((h) => h.score.value);
+    const handsValues = hands.map(h => h.score.value);
     const handsHighCardsValues = this.getHandsHighCardsValues(hands);
-    const restCards = hands.map((h) =>
-      h.score.restCards.sort((c1, c2) => (c1.value > c2.value ? -1 : 1))
-    );
+    const restCards = hands.map(h => h.score.restCards.sort((c1, c2) => (c1.value > c2.value ? -1 : 1)));
 
     return (
       this.haveSameHandsValue(handsValues) &&
@@ -62,31 +49,25 @@ export class HandsRankingManager {
   }
 
   private haveSameRestCardsValue(restCards: Card[][]) {
-    const restCardsValues: string[] = restCards.map((handCards) =>
-      handCards.map(({ value }) => value).join("")
-    );
-    return restCardsValues.every(
-      (handValue) => handValue === restCardsValues[0]
-    );
+    const restCardsValues: string[] = restCards.map(handCards => handCards.map(({ value }) => value).join(''));
+    return restCardsValues.every(handValue => handValue === restCardsValues[0]);
   }
 
   private haveSameHandsValue(handsValues: HandValue[]) {
-    return handsValues.every((handValue) => handValue === handsValues[0]);
+    return handsValues.every(handValue => handValue === handsValues[0]);
   }
 
   private haveSameHighCardValue(handsHighCardsValues: Card[][]) {
-    return handsHighCardsValues.every((hand) =>
+    return handsHighCardsValues.every(hand =>
       hand.every((cs, cIndex) => {
         return handsHighCardsValues[0][cIndex].value === cs.value;
-      })
+      }),
     );
   }
 
   private getHandsHighCardsValues(hands: Hand[]) {
-    return hands.map((h) =>
-      h.score.cards
-        .sort((c1, c2) => (new Card(c1).value > new Card(c2).value ? -1 : 1))
-        .map((cs) => new Card(cs))
+    return hands.map(h =>
+      h.score.cards.sort((c1, c2) => (new Card(c1).value > new Card(c2).value ? -1 : 1)).map(cs => new Card(cs)),
     );
   }
 
@@ -95,9 +76,7 @@ export class HandsRankingManager {
   }
 
   private sortDrawHands(h1: HandScore, h2: HandScore) {
-    const [highestCard1, highestCard2] = [h1, h2].map(
-      (h) => h1.rankCardsByValueDesc(h.cards.map((c) => new Card(c)))[0]
-    );
+    const [highestCard1, highestCard2] = [h1, h2].map(h => h1.rankCardsByValueDesc(h.cards.map(c => new Card(c)))[0]);
     if (this.isAWinnerCard(highestCard1, highestCard2)) {
       return this.firstCardWins(highestCard1, highestCard2) ? -1 : 1;
     } else {
@@ -106,10 +85,7 @@ export class HandsRankingManager {
   }
 
   private isAWinnerCard(highestCard1: Card, highestCard2: Card) {
-    return (
-      this.firstCardWins(highestCard1, highestCard2) ||
-      this.secondCardWins(highestCard1, highestCard2)
-    );
+    return this.firstCardWins(highestCard1, highestCard2) || this.secondCardWins(highestCard1, highestCard2);
   }
 
   private sortByRestCards(h1: HandScore, h2: HandScore) {
@@ -172,7 +148,7 @@ export class Hand {
   }
 
   private mapCards(handString: string) {
-    return handString.split(" ").map((c) => new Card(c));
+    return handString.split(' ').map(c => new Card(c));
   }
 
   public getScore(): HandScore {
@@ -199,21 +175,17 @@ export class HandScore {
   private scoreMap: Map<HandValue, { check: TestHandFn }> = new Map(
     this.handValidationProps.map(([value, fn]) => {
       return [value, { check: fn }];
-    })
+    }),
   );
 
   constructor(cards: Card[]) {
-    const originalCards = cards.map((c) => c.slug);
+    const originalCards = cards.map(c => c.slug);
     const { value, selectedCards } = this.scoreHandCards(cards);
-    this.restCards = this.rankCardsByValueDesc(
-      cards.filter((c) => !selectedCards.includes(c))
-    );
+    this.restCards = this.rankCardsByValueDesc(cards.filter(c => !selectedCards.includes(c)));
     this.value = value;
     this.cards = selectedCards
-      .map((c) => c.slug)
-      .sort((c1, c2) =>
-        originalCards.indexOf(c1) < originalCards.indexOf(c2) ? -1 : 1
-      );
+      .map(c => c.slug)
+      .sort((c1, c2) => (originalCards.indexOf(c1) < originalCards.indexOf(c2) ? -1 : 1));
   }
 
   private scoreHandCards(cards: Card[]): HandScoreResult {
@@ -228,7 +200,7 @@ export class HandScore {
   private getHandValue(cards: Card[]) {
     return Object.values(HandValue)
       .reverse()
-      .find((handValue) => this.scoreMap.get(handValue)!.check(cards))!;
+      .find(handValue => this.scoreMap.get(handValue)!.check(cards))!;
   }
 
   private getHighCard(cards: Card[]): Card[] {
@@ -238,18 +210,18 @@ export class HandScore {
 
   private getPair(cards: Card[]): Card[] | null {
     const same = this.sameValueCards(cards);
-    return same.find((s) => s.length === 2) || null;
+    return same.find(s => s.length === 2) || null;
   }
 
   private getTwoPairs(cards: Card[]): Card[] | null {
     const twoPairs = this.sameValueCards(cards)
-      .filter((s) => s.length === 2)
+      .filter(s => s.length === 2)
       .filter((_, i) => i % 2 === 0);
     return twoPairs.length === 2 ? [...twoPairs[0], ...twoPairs[1]] : null;
   }
 
   private getThreeOfAKind(cards: Card[]): Card[] | null {
-    return this.sameValueCards(cards).find((s) => s.length === 3) || null;
+    return this.sameValueCards(cards).find(s => s.length === 3) || null;
   }
 
   private getStraight(cards: Card[]): Card[] | null {
@@ -267,7 +239,7 @@ export class HandScore {
 
   private getFourOfAKind(cards: Card[]): Card[] | null {
     const same = this.sameValueCards(cards);
-    return same.find((s) => s.length === 4) || null;
+    return same.find(s => s.length === 4) || null;
   }
 
   private getStraightFlush(cards: Card[]): Card[] | null {
@@ -275,20 +247,12 @@ export class HandScore {
   }
 
   private sameValueCards(cards: Card[]): Card[][] {
-    return cards.map((card) => [
-      card,
-      ...cards.filter((c) => c.value === card.value && c.color !== card.color),
-    ]);
+    return cards.map(card => [card, ...cards.filter(c => c.value === card.value && c.color !== card.color)]);
   }
 
   private isAStraight(cards: Card[]): boolean {
-    const rankedValues = this.rankCardsByValueDesc(cards).map((c) =>
-      this.orderedValue.indexOf(c.value)
-    );
-    return rankedValues.every(
-      (val, i) =>
-        i === rankedValues.length - 1 || val === rankedValues[i + 1] - 1
-    );
+    const rankedValues = this.rankCardsByValueDesc(cards).map(c => this.orderedValue.indexOf(c.value));
+    return rankedValues.every((val, i) => i === rankedValues.length - 1 || val === rankedValues[i + 1] - 1);
   }
 
   private isAFlush(cards: Card[]): boolean {
@@ -296,11 +260,7 @@ export class HandScore {
   }
 
   public rankCardsByValueDesc(cards: Card[]) {
-    return cards.sort((c1, c2) =>
-      this.orderedValue.indexOf(c1.value) > this.orderedValue.indexOf(c2.value)
-        ? 1
-        : -1
-    );
+    return cards.sort((c1, c2) => (this.orderedValue.indexOf(c1.value) > this.orderedValue.indexOf(c2.value) ? 1 : -1));
   }
 }
 
@@ -308,7 +268,7 @@ export class Card {
   public color!: Color;
   public value!: CardValue;
   constructor(string: any) {
-    const [val, col] = string.split("");
+    const [val, col] = string.split('');
     this.color = col;
     this.value = val;
   }
@@ -322,12 +282,12 @@ export type ValidationResult = boolean | string;
 
 export class HandValidationService {
   private rules: ValidationFn[] = [
-    (args) => this.isNotEmpty(args),
-    (args) => this.hasFiveUniqCards(args),
-    (args) => this.allCardsAreValid(args),
+    args => this.isNotEmpty(args),
+    args => this.hasFiveUniqCards(args),
+    args => this.allCardsAreValid(args),
   ];
   validate(handString: any): boolean {
-    this.rules.forEach((fn) => {
+    this.rules.forEach(fn => {
       const validationResult: ValidationResult = fn(handString);
       if (this.isError(validationResult)) {
         throw new Error(validationResult as string);
@@ -337,36 +297,33 @@ export class HandValidationService {
   }
 
   private isNotEmpty(str: any): ValidationResult {
-    return str.length || "hand is empty";
+    return str.length || 'hand is empty';
   }
 
   private hasFiveUniqCards(str: any): ValidationResult {
-    const cardStrings = str.split(" ");
+    const cardStrings = str.split(' ');
     if (cardStrings.length !== 5) {
-      return "hand must have 5 cards";
+      return 'hand must have 5 cards';
     }
 
     const uniqCards = [...Array.from(new Set(cardStrings))];
     if (uniqCards.length !== 5) {
-      return "identical cards not allowed";
+      return 'identical cards not allowed';
     }
     return true;
   }
 
   private allCardsAreValid(handString: any): ValidationResult {
-    const cardStrings = handString.split(" ");
+    const cardStrings = handString.split(' ');
     const validations = cardStrings.map((cs: string) => this.isValidCard(cs));
     const error = validations.find(this.isError);
     return error || true;
   }
 
   private isValidCard(string: any): ValidationResult {
-    const [val, col] = string.split("");
+    const [val, col] = string.split('');
 
-    return (
-      (this.isValidValue(val) && this.isValidColor(col)) ||
-      `${val}${col} is not a valid card`
-    );
+    return (this.isValidValue(val) && this.isValidColor(col)) || `${val}${col} is not a valid card`;
   }
   private isValidColor(col: any) {
     return Object.values(Color).includes(col);
@@ -376,6 +333,6 @@ export class HandValidationService {
   }
 
   private isError(input: ValidationResult): boolean {
-    return typeof input === "string";
+    return typeof input === 'string';
   }
 }
